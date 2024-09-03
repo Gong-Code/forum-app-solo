@@ -2,8 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { FaFire } from 'react-icons/fa';
-import { MdOutlineNewReleases } from 'react-icons/md';
 import { Button } from '@/components/ui/button';
 
 import { cn } from '@/lib/utils';
@@ -16,13 +14,15 @@ import {
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { useAuth } from './authProvider';
+import { useAuth } from '../providers/authProvider';
 import { formatCategoryforURL } from '@/lib/formatCategory';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase.config';
 import { signOut } from 'firebase/auth';
 import { useState } from 'react';
 import Loading from './Loading';
+import { Badge } from '@/components/ui/badge';
+import { ModeToggle } from './ModeToggle';
 
 const threadCategories: { title: string; description: string }[] = [
     {
@@ -119,7 +119,9 @@ export const Navigation = () => {
                     </NavigationMenuContent>
                 </NavigationMenuItem>
             </NavigationMenuList>
+
             <div className='flex gap-4'>
+                <ModeToggle />
                 {!user ? (
                     <>
                         <Link href='/log-in'>
@@ -131,9 +133,11 @@ export const Navigation = () => {
                     </>
                 ) : (
                     <div className='flex gap-4'>
-                        <span className='flex items-center justify-center rounded-full bg-gray-200 w-10 h-10 mr-2'>
+                        <Badge
+                            variant='default'
+                            className='text-sm font-light'>
                             {getInitials(user.username)}
-                        </span>
+                        </Badge>
                         <Link href='/'>
                             <Button onClick={handleLogout}>Log out</Button>
                         </Link>

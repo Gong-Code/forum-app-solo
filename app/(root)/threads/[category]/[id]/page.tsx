@@ -18,13 +18,12 @@ import { Comments } from '@/app/_components/Comments';
 import { NewCommentForm } from '@/app/_components/NewCommentForm';
 import { Thread, Comment } from '@/app/types/thread';
 import { User } from '@/app/types/user';
-import { useAuth } from '@/app/_components/authProvider';
+import { useAuth } from '@/app/providers/authProvider';
 import { Badge } from '@/components/ui/badge';
 import Loading from '@/app/_components/Loading';
 import { AlertCircle } from 'lucide-react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { MarkedAsAnswered } from '@/app/_components/MarkedAsAnswered';
 
 type Params = {
     id: string;
@@ -123,17 +122,15 @@ const ThreadDetailsPage = () => {
     return (
         <main className='flex flex-col justify-between '>
             <div className='w-full mx-auto pl-12 px-6 max-w-6xl my-8 pt-6'>
-                <div className='rounded-md border'>
+                <div className='border'>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className='text-stone-600 text-sm font-semibold p-4 bg-stone-50 flex items-center justify-between h-auto w-full'>
+                                <TableHead className='text-muted-foreground text-sm font-semibold p-4 bg-secondary flex items-center justify-between h-auto w-full'>
                                     <div>
                                         <p>{thread.title}</p>
                                     </div>
-                                    <div
-                                        className='
-                                    mr-2'>
+                                    <div className='mr-2'>
                                         {user && (
                                             <button onClick={handleToggleLock}>
                                                 {thread.isLocked ? (
@@ -156,21 +153,21 @@ const ThreadDetailsPage = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell>
-                                    <div className='py-3 pl-1 pr-6 text-base'>
+                            <TableRow className='dark:bg-muted/50'>
+                                <TableCell className='dark:bg-muted/50'>
+                                    <div className='py-3 pl-1 pr-6 text-sm'>
                                         {thread.description}
                                     </div>
                                 </TableCell>
                             </TableRow>
                         </TableBody>
                         <TableBody>
-                            <TableRow className='bg-stone-50'>
+                            <TableRow className='bg-secondary'>
                                 <TableCell>
                                     <div className='flex justify-between items-center'>
                                         <span className='flex gap-1 text-muted-foreground'>
                                             By
-                                            <p className='font-bold text-indigo-700'>
+                                            <p className='font-bold text-indigo-700 dark:text-indigo-300'>
                                                 {' '}
                                                 {thread.creator.name}
                                             </p>
@@ -185,25 +182,24 @@ const ThreadDetailsPage = () => {
                         </TableBody>
                     </Table>
                 </div>
-                <div className='rounded-md border mt-6'>
-                    {thread && (
-                        <Comments
-                            comments={comments}
-                            threadId={thread.id}
-                            threadCreatorId={thread.creator.id}
-                            answered={answered}
-                            setAnswered={setAnswered}
-                            handleAnswered={handleMarkAsAnswered}
-                            answeredCommentId={answeredCommentId ?? null}
-                            isQnA={thread.isQnA ?? false}
-                            isLocked={thread.isLocked}
-                        />
-                    )}
-                </div>
+
+                {thread && (
+                    <Comments
+                        comments={comments}
+                        threadId={thread.id}
+                        threadCreatorId={thread.creator.id}
+                        answered={answered}
+                        setAnswered={setAnswered}
+                        handleAnswered={handleMarkAsAnswered}
+                        answeredCommentId={answeredCommentId ?? null}
+                        isQnA={thread.isQnA ?? false}
+                        isLocked={thread.isLocked}
+                    />
+                )}
             </div>
 
             {!thread.isLocked && user && (
-                <div className='w-full pl-12 px-6 py-8 bg-gray-200'>
+                <div className='w-full pl-12 px-6 py-8 bg-primary-foreground'>
                     <div className='mx-auto max-w-3xl'>
                         <NewCommentForm
                             id={thread.id}

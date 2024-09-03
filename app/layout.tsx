@@ -1,32 +1,40 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "react-hot-toast";
-import AuthContextProvider from "./_components/authProvider";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Toaster } from 'react-hot-toast';
+import AuthContextProvider from './providers/authProvider';
+import { ThemeProvider } from './providers/themeProvider';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Forum App",
-  description: "Forum",
+    title: 'Forum App',
+    description: 'Forum',
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <AuthContextProvider>
-      <html lang="en" suppressHydrationWarning>
-        {/*Providers ska vara här*/}
-        <body className={inter.className}>
-          <>
-            <Toaster />
-            {children}
-          </>
-        </body>
-      </html>
-    </AuthContextProvider>
-  );
+    return (
+        <html
+            lang='en'
+            suppressHydrationWarning>
+            <body className={inter.className}>
+                <ThemeProvider
+                    attribute='class'
+                    defaultTheme='system'
+                    enableSystem
+                    disableTransitionOnChange>
+                    <AuthContextProvider>
+                        <>
+                            <Toaster />
+                            {children}
+                        </>
+                    </AuthContextProvider>
+                </ThemeProvider>
+            </body>
+        </html>
+    );
 }

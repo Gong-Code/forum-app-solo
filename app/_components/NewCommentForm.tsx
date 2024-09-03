@@ -17,7 +17,7 @@ import { addCommentToThread } from '@/lib/thread.db';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { Timestamp } from 'firebase/firestore';
-import { useAuth } from './authProvider';
+import { useAuth } from '../providers/authProvider';
 import { Textarea } from '@/components/ui/textarea';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { Badge } from '@/components/ui/badge';
@@ -112,7 +112,8 @@ export const NewCommentForm: React.FC<NewCommentFormProps> = ({
                 <Button
                     type='submit'
                     className='px-6 flex gap-2 items-center'>
-                    <RiRadioButtonLine className='animate-pulse'/> <span>Add comment</span>
+                    <RiRadioButtonLine className='animate-pulse' />{' '}
+                    <span>Add comment</span>
                 </Button>
             </form>
         </Form>
