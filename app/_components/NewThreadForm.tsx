@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 import { ComboBox } from './SelectCategoryNewThread';
 import { Timestamp } from 'firebase/firestore';
-import { useAuth } from './authProvider';
+import { useAuth } from '../providers/authProvider';
 import { Thread, ThreadCategory } from '../types/thread';
 import { createThread } from '@/lib/thread.db';
 import { Checkbox } from '@/components/ui/checkbox';
