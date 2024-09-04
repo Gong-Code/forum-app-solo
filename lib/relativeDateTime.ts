@@ -1,11 +1,18 @@
-export const timeDifference = (current: any, previous: any) => {
-    var msPerMinute = 60 * 1000;
-    var msPerHour = msPerMinute * 60;
-    var msPerDay = msPerHour * 24;
-    var msPerMonth = msPerDay * 30;
-    var msPerYear = msPerDay * 365;
+export const timeDifference = (
+    current: Date | number,
+    previous: Date | number
+) => {
+    const currentTime = current instanceof Date ? current.getTime() : current;
+    const previousTime =
+        previous instanceof Date ? previous.getTime() : previous;
 
-    var elapsed = current - previous;
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+    const msPerMonth = msPerDay * 30;
+    const msPerYear = msPerDay * 365;
+
+    const elapsed = currentTime - previousTime;
 
     if (elapsed < msPerMinute) {
         return Math.round(elapsed / 1000) + ' seconds ago';

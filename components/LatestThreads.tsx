@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
-import { Thread } from '../types/thread';
+import { Thread } from '../app/types/thread';
 import { getAllThreads, getThreadById } from '@/lib/thread.db';
 import {
     Table,

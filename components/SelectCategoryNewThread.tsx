@@ -18,7 +18,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import { ThreadCategory } from '../types/thread';
+import { ThreadCategory } from '../app/types/thread';
 
 const categories: ThreadCategory[] = [
     'Software Development',

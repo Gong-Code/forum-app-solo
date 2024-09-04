@@ -14,32 +14,31 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import { Comments } from '@/app/_components/Comments';
-import { NewCommentForm } from '@/app/_components/NewCommentForm';
+import { Comments } from '@/components/Comments';
+import { NewCommentForm } from '@/components/NewCommentForm';
 import { Thread, Comment } from '@/app/types/thread';
 import { User } from '@/app/types/user';
 import { useAuth } from '@/app/providers/authProvider';
 import { Badge } from '@/components/ui/badge';
-import Loading from '@/app/_components/Loading';
+import Loading from '@/components/Loading';
 import { AlertCircle } from 'lucide-react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-type Params = {
-    id: string;
-};
+import { useComments } from '@/app/contexts/CommentsContext';
 
 const ThreadDetailsPage = () => {
+    const {
+        handleCommentSubmit,
+        setComments,
+        setAnswered,
+        setAnsweredCommentId,
+        id,
+    } = useComments();
+
     const [thread, setThread] = useState<Thread | null>(null);
-    const [comments, setComments] = useState<Comment[]>([]);
-    const [answered, setAnswered] = useState<boolean>(false);
-    const [answeredCommentId, setAnsweredCommentId] = useState<string | null>(
-        null
-    );
     const [threadCreatorId, setThreadCreatorId] = useState<User | null>(null);
     const { user } = useAuth();
     const router = useRouter();
-    const { id } = useParams<Params>();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -71,40 +70,6 @@ const ThreadDetailsPage = () => {
 
         fetchThread();
     }, [id, router]);
-
-    const handleCommentSubmit = async (newComment: Comment) => {
-        if (thread) {
-            setComments([...comments, newComment]);
-        }
-    };
-
-    const handleMarkAsAnswered = async (commentId: string) => {
-        try {
-            if (!thread) {
-                console.error('Thread not found.');
-                return;
-            }
-
-            const newIsAnswered = answeredCommentId !== commentId;
-
-            const fieldsToUpdate: Partial<Thread> = {
-                isAnswered: newIsAnswered,
-            };
-
-            if (newIsAnswered) {
-                fieldsToUpdate.answeredCommentId = commentId;
-            } else {
-                fieldsToUpdate.answeredCommentId = null;
-            }
-
-            await updateThread(thread.id, fieldsToUpdate);
-
-            setAnswered(newIsAnswered);
-            setAnsweredCommentId(newIsAnswered ? commentId : null);
-        } catch (error) {
-            console.error('Error toggling comment as answered:', error);
-        }
-    };
 
     const handleToggleLock = async () => {
         if (!thread) return;
@@ -185,13 +150,6 @@ const ThreadDetailsPage = () => {
 
                 {thread && (
                     <Comments
-                        comments={comments}
-                        threadId={thread.id}
-                        threadCreatorId={thread.creator.id}
-                        answered={answered}
-                        setAnswered={setAnswered}
-                        handleAnswered={handleMarkAsAnswered}
-                        answeredCommentId={answeredCommentId ?? null}
                         isQnA={thread.isQnA ?? false}
                         isLocked={thread.isLocked}
                     />

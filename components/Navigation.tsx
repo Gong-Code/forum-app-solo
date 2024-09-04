@@ -14,7 +14,7 @@ import {
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { useAuth } from '../providers/authProvider';
+import { useAuth } from '../app/providers/authProvider';
 import { formatCategoryforURL } from '@/lib/formatCategory';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase.config';

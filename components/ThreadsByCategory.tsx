@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Thread, ThreadCategory } from '../types/thread';
+import { Thread, ThreadCategory } from '../app/types/thread';
 import { getAllThreads } from '@/lib/thread.db';
 import { useState, useEffect } from 'react';
 import { formatCategory } from '@/lib/formatCategory';
