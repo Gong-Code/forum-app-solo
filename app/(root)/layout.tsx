@@ -1,4 +1,4 @@
-import { Navigation } from '../_components/Navigation';
+import { Navigation } from '../../components/Navigation';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     return (

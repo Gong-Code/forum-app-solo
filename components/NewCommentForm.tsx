@@ -12,12 +12,12 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Comment } from '../types/thread';
+import { Comment } from '../app/types/thread';
 import { addCommentToThread } from '@/lib/thread.db';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { Timestamp } from 'firebase/firestore';
-import { useAuth } from '../providers/authProvider';
+import { useAuth } from '../app/providers/authProvider';
 import { Textarea } from '@/components/ui/textarea';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { Badge } from '@/components/ui/badge';

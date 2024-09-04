@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { LatestThreads } from '../_components/LatestThreads';
+import { LatestThreads } from '../../components/LatestThreads';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

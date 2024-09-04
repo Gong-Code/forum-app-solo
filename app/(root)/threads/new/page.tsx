@@ -1,4 +1,4 @@
-import { NewThreadForm } from "@/app/_components/NewThreadForm";
+import { NewThreadForm } from '@/components/NewThreadForm';
 
 const CreateNewThread = () => {
     return <NewThreadForm />;

@@ -8,8 +8,8 @@ import { ThemeProvider } from './providers/themeProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'Forum App',
-    description: 'Forum',
+    title: 'Threads',
+    description: 'A forum for discussing IT, software and security.',
 };
 
 export default function RootLayout({
@@ -27,12 +27,12 @@ export default function RootLayout({
                     defaultTheme='system'
                     enableSystem
                     disableTransitionOnChange>
-                    <AuthContextProvider>
-                        <>
-                            <Toaster />
-                            {children}
-                        </>
-                    </AuthContextProvider>
+                        <AuthContextProvider>
+                            <>
+                                <Toaster />
+                                {children}
+                            </>
+                        </AuthContextProvider>
                 </ThemeProvider>
             </body>
         </html>

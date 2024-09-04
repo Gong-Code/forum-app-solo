@@ -6,42 +6,30 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Comment } from '../types/thread';
 import { FaCheck } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { MarkedAsAnswered } from './MarkedAsAnswered';
 import { timeDifference } from '@/lib/relativeDateTime';
 import { FaCircleUser } from 'react-icons/fa6';
-import { useAuth } from '../providers/authProvider';
+import { useAuth } from '../app/providers/authProvider';
+import { useComments } from '@/app/contexts/CommentsContext';
 
 type CommentsProps = {
-    comments: Comment[];
-    threadId: string;
-    threadCreatorId: string;
-    answered: boolean;
-    answeredCommentId: string | null;
-    setAnswered: (answered: boolean) => void;
-    handleAnswered: (commentId: string) => Promise<void>;
     isQnA: boolean;
     isLocked: boolean;
 };
 
-export const Comments: React.FC<CommentsProps> = ({
-    comments = [],
-    threadCreatorId,
-    answered,
-    answeredCommentId,
-    handleAnswered,
-    isQnA,
-    isLocked,
-}) => {
+export const Comments: React.FC<CommentsProps> = ({ isQnA, isLocked }) => {
+    const {
+        comments,
+        answeredComment,
+        answeredCommentId,
+        handleMarkAsAnswered,
+    } = useComments();
+
     const { user: currentUser } = useAuth();
     const router = useRouter();
-
-    const answeredComment = comments.find(
-        (comment) => comment.id === answeredCommentId
-    );
 
     return (
         <>
@@ -72,7 +60,9 @@ export const Comments: React.FC<CommentsProps> = ({
                     {comments.map((comment, index) => {
                         const isAnswered = comment.id === answeredCommentId;
                         return (
-                            <TableRow key={comment.id || index} className='dark:bg-muted/50'>
+                            <TableRow
+                                key={comment.id || index}
+                                className='dark:bg-muted/50'>
                                 <TableCell>
                                     <div className='block p-3 w-full rounded-sm bg-background outline outline-1 outline-white shadow-sm shadow-slate-300 dark:bg-muted dark:outline-white/10 dark:shadow-none'>
                                         {comment.content}
@@ -115,7 +105,7 @@ export const Comments: React.FC<CommentsProps> = ({
                                                         }`}
                                                         onClick={() => {
                                                             if (currentUser) {
-                                                                handleAnswered(
+                                                                handleMarkAsAnswered(
                                                                     comment.id
                                                                 );
                                                             } else {
