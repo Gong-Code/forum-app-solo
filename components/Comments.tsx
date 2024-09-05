@@ -6,7 +6,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { FaCheck } from 'react-icons/fa';
+import { FaCheck, FaStar } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { MarkedAsAnswered } from './MarkedAsAnswered';
@@ -35,7 +35,7 @@ export const Comments: React.FC<CommentsProps> = ({ isQnA, isLocked }) => {
         <>
             {isQnA && answeredComment && (
                 <MarkedAsAnswered
-                    key={answeredComment.id}
+                    key={answeredComment.commentId}
                     comment={answeredComment}
                 />
             )}
@@ -58,10 +58,10 @@ export const Comments: React.FC<CommentsProps> = ({ isQnA, isLocked }) => {
                         </TableRow>
                     )}
                     {comments.map((comment, index) => {
-                        const isAnswered = comment.id === answeredCommentId;
+                        const isAnswered = comment.commentId === answeredCommentId;
                         return (
                             <TableRow
-                                key={comment.id || index}
+                                key={comment.commentId || index}
                                 className='dark:bg-muted/50'>
                                 <TableCell>
                                     <div className='block p-3 w-full rounded-sm bg-background outline outline-1 outline-white shadow-sm shadow-slate-300 dark:bg-muted dark:outline-white/10 dark:shadow-none'>
@@ -74,6 +74,9 @@ export const Comments: React.FC<CommentsProps> = ({ isQnA, isLocked }) => {
                                                 <span className='text-xs font-semibold'>
                                                     {comment.creator?.username}
                                                 </span>
+                                                {comment.creator?.isModerator && (
+                                                    <FaStar className='text-yellow-500' />
+                                                )}
                                             </span>
                                             <span className='text-xs text-muted-foreground'>
                                                 {timeDifference(
@@ -106,7 +109,7 @@ export const Comments: React.FC<CommentsProps> = ({ isQnA, isLocked }) => {
                                                         onClick={() => {
                                                             if (currentUser) {
                                                                 handleMarkAsAnswered(
-                                                                    comment.id
+                                                                    comment.commentId
                                                                 );
                                                             } else {
                                                                 router.push(

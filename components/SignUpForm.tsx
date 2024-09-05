@@ -25,6 +25,7 @@ type SignUpFormValues = {
     lastName: string;
     email: string;
     password: string;
+    isModerator: boolean;
 };
 
 const formSchema = z.object({
@@ -34,6 +35,7 @@ const formSchema = z.object({
     password: z.string().min(6, {
         message: 'The password must be at least 6 characters long',
     }),
+    isModerator: z.boolean().optional(),
 });
 
 export const SignUpForm = () => {
@@ -47,6 +49,7 @@ export const SignUpForm = () => {
             lastName: '',
             email: '',
             password: '',
+            isModerator: false,
         },
     });
 
@@ -62,6 +65,7 @@ export const SignUpForm = () => {
                 name: '',
                 email: values.email,
                 password: values.password,
+                isModerator: values.isModerator,
             });
             router.push('/');
             console.log('User added successfully');
@@ -153,6 +157,22 @@ export const SignUpForm = () => {
                                     <MdErrorOutline />
                                     <span className='text-xs'>
                                         {form.formState.errors.password.message}
+                                    </span>
+                                </span>
+                            )}
+                        </div>
+                        <div className='grid gap-2'>
+                            <Label htmlFor='isModerator'>Moderator</Label>
+                            <input
+                                id='isModerator'
+                                type='checkbox'
+                                {...form.register('isModerator')}
+                            />
+                            {form.formState.errors.isModerator && (
+                                <span className='text-error text-xs mt-[2px] flex gap-1 items-center'>
+                                    <MdErrorOutline />
+                                    <span className='text-xs'>
+                                        {form.formState.errors.isModerator.message}
                                     </span>
                                 </span>
                             )}

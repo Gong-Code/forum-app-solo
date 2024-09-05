@@ -56,9 +56,11 @@ export const getThreadById = async (id: string): Promise<Thread | null> => {
             creationDate: Timestamp.fromDate(data.creationDate.toDate()),
             comments: data.comments ? data.comments.map((comment: Comment, index: number) => ({
                 ...comment,
-                id: comment.id || `${id}-${index}`,
+                id: comment.commentId || `${id}-${index}`,
                 creationDate: Timestamp.fromDate(comment.creationDate.toDate()),
-                user: comment.creator.email
+                user: comment.creator.email,
+                isModerator: comment.creator.isModerator
+
             })) : []
         };
 
@@ -180,3 +182,4 @@ export const addCommentToThread = async (threadId: string, comment: Comment): Pr
         throw new Error('Failed to add comment: ' + (error as Error).message);
     }
 };
+

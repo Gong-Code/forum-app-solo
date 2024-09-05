@@ -1,6 +1,6 @@
 "use client";
 
-import { auth } from "@/firebase.config";
+import { auth, db } from "@/firebase.config";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -18,6 +18,7 @@ import {
 } from "react";
 import toast from "react-hot-toast";
 import { User } from "../types/user";
+import { getDoc, doc } from "firebase/firestore";
 
 type AuthValues = {
   email: string;
@@ -41,23 +42,30 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [authLoaded, setAuthLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (_user) => {
-      if (_user) {
-        const user = {
-          id: _user.uid,
-          username: _user.displayName || "",
-          name: "",
-          email: _user.email || "",
-          password: "",
-        };
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-      setAuthLoaded(true);
-    });
+      const unsub = onAuthStateChanged(auth, async (_user) => {
+          if (_user) {
+              const userDoc = await getDoc(doc(db, 'users', _user.uid));
+              if (userDoc.exists()) {
+                  const userData = userDoc.data();
+                  const user: User = {
+                      id: _user.uid,
+                      username: _user.displayName || "",
+                      name: userData.name || "",
+                      email: _user.email || "",
+                      password: "",
+                      isModerator: userData.isModerator || false,
+                  };
+                  setUser(user);
+              } else {
+                  setUser(null);
+              }
+          } else {
+              setUser(null);
+          }
+          setAuthLoaded(true);
+      });
 
-    return () => unsub();
+      return () => unsub();
   }, []);
 
   const register = async (values: AuthValues): Promise<string | void> => {

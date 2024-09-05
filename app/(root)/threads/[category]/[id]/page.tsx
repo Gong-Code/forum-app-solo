@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getThreadById, lockThread, updateThread } from '@/lib/thread.db';
+import { getThreadById, lockThread } from '@/lib/thread.db';
 import { FaUnlock, FaLock } from 'react-icons/fa';
 
 import {

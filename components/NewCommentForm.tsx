@@ -61,7 +61,7 @@ export const NewCommentForm: React.FC<NewCommentFormProps> = ({
 
         try {
             const newComment: Comment = {
-                id: uuidv4(),
+                commentId: uuidv4(),
                 content: data.commentBody,
                 creationDate: Timestamp.now(),
                 creator: {
@@ -69,6 +69,7 @@ export const NewCommentForm: React.FC<NewCommentFormProps> = ({
                     username: currentUser.username,
                     email: currentUser.email,
                     name: currentUser.name || '',
+                    isModerator: currentUser.isModerator ||false
                 },
             };
 

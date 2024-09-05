@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import { User } from "./user";
+import { Moderator, User } from "./user";
 
 type ThreadCategory =
     | 'Software Development'
@@ -11,7 +11,7 @@ type ThreadCategory =
 type ThreadStatus = 'New' | 'Hot';
 
 export type Comment = {
-  id: string;
+  commentId: string;
   content: string;
   creationDate: Timestamp;
   creator: User;

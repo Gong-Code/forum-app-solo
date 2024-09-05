@@ -51,7 +51,7 @@ const CommentsProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     const answeredComment = comments.find(
-        (comment) => comment.id === answeredCommentId
+        (comment) => comment.commentId === answeredCommentId
     );
 
     const handleCommentSubmit = async (newComment: Comment): Promise<void> => {
