@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getThreadById, lockThread } from '@/lib/thread.db';
-import { FaUnlock, FaLock } from 'react-icons/fa';
+import { FaUnlock, FaLock, FaEdit } from 'react-icons/fa';
 
 import {
     Table,
@@ -22,9 +22,11 @@ import { useAuth } from '@/app/providers/authProvider';
 import { Badge } from '@/components/ui/badge';
 import Loading from '@/components/Loading';
 import { AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useComments } from '@/app/contexts/CommentsContext';
+
 
 const ThreadDetailsPage = () => {
     const {
@@ -37,7 +39,7 @@ const ThreadDetailsPage = () => {
 
     const [thread, setThread] = useState<Thread | null>(null);
     const [threadCreatorId, setThreadCreatorId] = useState<User | null>(null);
-    const { user } = useAuth();
+    const { user: currentUser } = useAuth() as { user: User | null };
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
@@ -71,8 +73,27 @@ const ThreadDetailsPage = () => {
         fetchThread();
     }, [id, router]);
 
+    const handleEditClick = async () => {
+        try {
+            const fetchedThread = await getThreadById(thread.id);
+            if (fetchedThread && (fetchedThread.creator.id === currentUser.id || currentUser.isModerator)) {
+                router.push(`/threads/${fetchedThread.category}/edit/${fetchedThread.id}`);
+            } else {
+                toast.error('You do not have permission to edit this thread.');
+            }
+        } catch (error) {
+            console.error('Error fetching thread data:', error);
+            toast.error('Failed to fetch thread data.');
+        }
+    };
+
     const handleToggleLock = async () => {
         if (!thread) return;
+
+        if (thread.creator.id !== currentUser.id && !currentUser.isModerator) {
+            toast.error('You do not have permission to lock/unlock this thread.');
+            return;
+        }
 
         try {
             await lockThread(thread.id, !thread.isLocked);
@@ -96,22 +117,35 @@ const ThreadDetailsPage = () => {
                                         <p>{thread.title}</p>
                                     </div>
                                     <div className='mr-2'>
-                                        {user && (
-                                            <button onClick={handleToggleLock}>
-                                                {thread.isLocked ? (
-                                                    <Badge
-                                                        variant='destructive'
-                                                        className='rounded-full p-3'>
-                                                        <FaLock className='h-3 w-3' />
-                                                    </Badge>
-                                                ) : (
+                                        {currentUser && (
+                                            <>
+                                                <button onClick={handleToggleLock}>
+                                                    {thread?.isLocked ? (
+                                                        <Badge
+                                                            variant='destructive'
+                                                            className='rounded-full p-3'>
+                                                            <FaLock className='h-3 w-3' />
+                                                        </Badge>
+                                                    ) : (
+                                                        <Badge
+                                                            variant='secondary'
+                                                            className='rounded-full p-3 transition-all duration-300 hover:scale-105'>
+                                                            <FaUnlock className='h-3 w-3' />
+                                                        </Badge>
+                                                    )}
+                                                </button>
+                                                {(thread.creator.id === currentUser.id || currentUser.isModerator) && (
+                                                    <button
+                                                        onClick={handleEditClick}
+                                                        className='ml-2 p-3 transition-all duration-300 hover:scale-105'>
                                                     <Badge
                                                         variant='secondary'
                                                         className='rounded-full p-3 transition-all duration-300 hover:scale-105'>
-                                                        <FaUnlock className='h-3 w-3' />
+                                                        <FaEdit className='h-3 w-3' />
                                                     </Badge>
+                                                    </button>
                                                 )}
-                                            </button>
+                                            </>                                      
                                         )}
                                     </div>
                                 </TableHead>
@@ -156,7 +190,7 @@ const ThreadDetailsPage = () => {
                 )}
             </div>
 
-            {!thread.isLocked && user && (
+            {!thread.isLocked && currentUser && (
                 <div className='w-full pl-12 px-6 py-8 bg-primary-foreground'>
                     <div className='mx-auto max-w-3xl'>
                         <NewCommentForm

@@ -5,6 +5,9 @@ import toast from 'react-hot-toast';
 import { Timestamp } from 'firebase/firestore'; 
 import { getUserById } from './user.db';
 
+type UserProps = {
+    isModerator: boolean;
+}
 
 export const getAllThreads = async (): Promise<Thread[]> => {
     try {
@@ -180,6 +183,60 @@ export const addCommentToThread = async (threadId: string, comment: Comment): Pr
     } catch (error) {
         toast.error('Failed to add comment: ' + (error as Error).message);
         throw new Error('Failed to add comment: ' + (error as Error).message);
+    }
+};
+
+export const editThread = async (threadId: string, user: UserProps, updatedData: Partial<Thread>): Promise<Thread | null> => {
+    try {
+        const threadDocRef = doc(db, 'threads', threadId);
+        const threadDoc = await getDoc(threadDocRef);
+
+        if (!threadDoc.exists()) {
+            toast.error('No thread found!');
+            return null;
+        }
+
+        const threadData = threadDoc.data() as Thread;
+
+        // Check if the user is the creator or a moderator
+        if (threadData.creator.id !== user.id && !user.isModerator) {
+            toast.error('You do not have permission to edit this thread.');
+            throw new Error('You do not have permission to edit this thread.');
+        }
+
+        // Update the thread with the provided data
+        await updateDoc(threadDocRef, updatedData);
+        toast.success('Thread updated successfully!');
+        return { ...threadData, ...updatedData };
+    } catch (error) {
+        toast.error('Failed to edit thread: ' + (error as Error).message);
+        throw new Error('Failed to edit thread: ' + (error as Error).message);
+    }
+};
+
+export const deleteThreadByModerator = async (threadId: string, user: UserProps): Promise<Thread | null> => {
+    if (!user.isModerator) {
+        toast.error('You do not have permission to delete this thread.');
+        throw new Error('You do not have permission to delete this thread.');
+    }
+
+    try {
+        const threadDocRef = doc(db, 'threads', threadId);
+        const threadDoc = await getDoc(threadDocRef);
+
+        if (threadDoc.exists()) {
+            const threadData = threadDoc.data() as Thread;
+            await deleteDoc(threadDocRef);
+            toast.success('Thread deleted successfully!');
+            return threadData;
+        } else {
+            toast.error('No thread found!');
+            return null;
+        }
+    } catch (error) {
+        console.error('Failed to delete thread:', error);
+        toast.error('Failed to delete thread: ' + (error as Error).message);
+        throw new Error('Failed to delete thread: ' + (error as Error).message);
     }
 };
 

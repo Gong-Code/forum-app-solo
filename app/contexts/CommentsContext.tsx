@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { Comment, Thread } from '@/app/types/thread';
 import { getThreadById, updateThread } from '@/lib/thread.db';
 import { useParams } from 'next/navigation';
+import { useAuth } from '@/app/providers/authProvider';
+import toast from 'react-hot-toast';
 
 type CommentsContextType = {
     comments: Comment[];
@@ -36,6 +38,7 @@ const CommentsProvider: React.FC<{ children: React.ReactNode }> = ({
         null
     );
     const { id } = useParams<Params>();
+    const { user: currentUser } = useAuth() as { user: User | null };
 
     useEffect(() => {
         const fetchThreadData = async () => {
@@ -64,6 +67,12 @@ const CommentsProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
             if (!thread) {
                 console.error('Thread not found.');
+                return;
+            }
+            
+            if (thread.creator.id !== currentUser?.id) {
+                console.error('You do not have permission to mark an answer.');
+                toast.error('You do not have permission to mark an answer.');
                 return;
             }
 
