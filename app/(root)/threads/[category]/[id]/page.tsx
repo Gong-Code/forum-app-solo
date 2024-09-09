@@ -117,6 +117,15 @@ const ThreadDetailsPage = () => {
                                 <TableHead className='text-muted-foreground text-sm font-semibold p-4 bg-secondary flex items-center justify-between h-auto w-full'>
                                     <div>
                                         <p>{thread.title}</p>
+                                        {thread.tags.length > 0 && (
+                                            <div className='flex gap-1 mt-1 items-center'>
+                                                {thread.tags.map((tag) => (
+                                                    <Badge key={tag.threadTagId} variant='default'>
+                                                        {tag.tagType}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                     <div className='mr-2'>
                                         {currentUser && (

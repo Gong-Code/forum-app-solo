@@ -20,13 +20,14 @@ import toast from 'react-hot-toast';
 import { ComboBox } from './SelectCategoryNewThread';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../app/providers/authProvider';
-import { Thread, ThreadCategory } from '../app/types/thread';
+import { TagType, Thread, ThreadCategory, ThreadTag } from '../app/types/thread';
 import { createThread } from '@/lib/thread.db';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { useRouter } from 'next/navigation';
 import { ThreadSchema } from '@/lib/schemas';
+import { TagComboBox } from './SelectTagNewThread';
 
 export const NewThreadForm = () => {
     const { user: currentUser } = useAuth();
@@ -38,6 +39,7 @@ export const NewThreadForm = () => {
             description: '',
             threadCategory: '',
             isQnA: false,
+            tags: [] as { threadTagId: string; tagType: TagType }[],
         } as z.infer<typeof ThreadSchema>,
     });
 
@@ -64,6 +66,7 @@ export const NewThreadForm = () => {
                 isQnA: data.isQnA || false,
                 isAnswered: false,
                 isLocked: false,
+                tags: data.tags as ThreadTag[]
             };
 
             await createThread(newThread);
@@ -169,6 +172,21 @@ export const NewThreadForm = () => {
                             </FormItem>
                         )}
                     />
+                <FormField
+                    control={form.control}
+                    name='tags'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <TagComboBox
+                                    value={field.value as ThreadTag[]}
+                                    onChange={field.onChange}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                     <Button
                         type='submit'
                         className='px-8'>

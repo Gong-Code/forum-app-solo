@@ -7,6 +7,7 @@ type ThreadCategory =
     | 'Hardware & Gadgets'
     | 'Cloud Computing'
     | 'Tech News & Trends';
+    
 
 type ThreadStatus = 'New' | 'Hot';
 
@@ -16,6 +17,24 @@ export type Comment = {
   creationDate: Timestamp;
   creator: User;
 }
+
+export type TagType = 
+  | "WEB DEVELOPMENT"
+  | "MOBILE DEVELOPMENT"
+  | "DATA SCIENCE"
+  | "MACHINE LEARNING"
+  | "DEVOPS"
+  | "UI/UX DESIGN"
+  | "CYBERSECURITY"
+  | "CLOUD COMPUTING"
+  | "GAME DEVELOPMENT"
+  | "DATABASES";
+
+
+export type ThreadTag = {
+  threadTagId: string;
+  tagType: TagType;
+};
 
 export type Thread = {
   id: string;
@@ -30,6 +49,7 @@ export type Thread = {
   isAnswered?:boolean;
   answeredCommentId?: string | null;
   isLocked: boolean;
+  tags: ThreadTag[];
 }
 
 

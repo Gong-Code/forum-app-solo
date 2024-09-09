@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { useAuth } from '@/app/providers/authProvider';
 import { User } from '@/app/types/user';
 import { useParams, useRouter } from 'next/navigation';
-import { Thread, ThreadCategory } from '@/app/types/thread';
+import { TagType, ThreadCategory, ThreadTag } from '@/app/types/thread';
 import { useForm } from 'react-hook-form';
 import { getThreadById, editThread } from '@/lib/thread.db';
 import toast from 'react-hot-toast';
@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { ComboBox } from '@/components/SelectCategoryNewThread';
 import { Button } from '@/components/ui/button';
 import { ThreadSchema } from '@/lib/schemas';
+import { TagComboBox } from '@/components/SelectTagNewThread';
 
 
 type Param = {
@@ -39,6 +40,7 @@ const EditThread = () => {
             description: '',
             threadCategory: '',
             isQnA: false,
+            tags: [] as ThreadTag[]
         } as z.infer<typeof ThreadSchema>,
     });
 
@@ -65,16 +67,25 @@ const EditThread = () => {
                 return;
             }
 
+            const mappedTags: [ThreadTag, ...ThreadTag[]] = fetchedThread.tags.map(tag => ({
+                threadTagId: tag.threadTagId,
+                tagType: tag.tagType as "WEB DEVELOPMENT" | "MOBILE DEVELOPMENT" | "DATA SCIENCE" | "MACHINE LEARNING" | "DEVOPS" | "UI/UX DESIGN" | "CYBERSECURITY" | "CLOUD COMPUTING" | "GAME DEVELOPMENT" | "DATABASES"
+            })) as [ThreadTag, ...ThreadTag[]];
+    
             form.setValue('title', fetchedThread.title);
             form.setValue('description', fetchedThread.description);
             form.setValue('threadCategory', fetchedThread.category);
             form.setValue('isQnA', fetchedThread.isQnA);
+            form.setValue('tags', mappedTags);
+    
             setThreadData({
                 title: fetchedThread.title,
                 description: fetchedThread.description,
                 threadCategory: fetchedThread.category,
                 isQnA: fetchedThread.isQnA,
+                tags: mappedTags
             });
+            
             setLoading(false);
         } catch (error) {
             console.error('Error fetching thread data:', error);
@@ -92,23 +103,30 @@ const EditThread = () => {
             toast.error('You must be logged in to edit a thread.');
             return;
         }
-
+    
         try {
-        const updatedThread = await editThread(id, currentUser, data);
-        if (updatedThread) {
-            console.log('Updated thread:', updatedThread);
-            setThreadData({
-                title: updatedThread.title,
-                description: updatedThread.description,
-                threadCategory: updatedThread.category,
-                isQnA: updatedThread.isQnA,
-            });
-            router.push(`/`);
+            const updatedThread = await editThread(id, currentUser, data);
+    
+            if (updatedThread) {
+                const mappedTags: [ThreadTag, ...ThreadTag[]] = updatedThread.tags.map(tag => ({
+                    threadTagId: tag.threadTagId,
+                    tagType: tag.tagType as "WEB DEVELOPMENT" | "MOBILE DEVELOPMENT" | "DATA SCIENCE" | "MACHINE LEARNING" | "DEVOPS" | "UI/UX DESIGN" | "CYBERSECURITY" | "CLOUD COMPUTING" | "GAME DEVELOPMENT" | "DATABASES"
+                })) as [ThreadTag, ...ThreadTag[]];
+    
+                console.log('Updated thread:', updatedThread);
+                setThreadData({
+                    title: updatedThread.title,
+                    description: updatedThread.description,
+                    threadCategory: updatedThread.category,
+                    isQnA: updatedThread.isQnA,
+                    tags: mappedTags
+                });
+                router.push(`/`);
+            }
+        } catch (error) {
+            console.error('Error updating thread:', error);
+            toast.error('Failed to update thread.');
         }
-    } catch (error) {
-        console.error('Error updating thread:', error);
-        toast.error('Failed to update thread.');
-    }
     };
 
     if (loading) return <Loading />;
@@ -191,6 +209,21 @@ const EditThread = () => {
                                 <FormControl>
                                     <ComboBox
                                         value={field.value as ThreadCategory}
+                                        onChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name='tags'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <TagComboBox
+                                        value={field.value as ThreadTag[]}
                                         onChange={field.onChange}
                                     />
                                 </FormControl>

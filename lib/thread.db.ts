@@ -18,6 +18,7 @@ export const getAllThreads = async (): Promise<Thread[]> => {
                     id: doc.id,
                     creationDate: Timestamp.fromDate(data.creationDate.toDate()),
                     comments: [],
+                    tags: data.tags || []
                 };
 
                 const commentsCollection = collection(db, 'threads', doc.id, 'comments');
@@ -64,11 +65,13 @@ export const getThreadById = async (id: string): Promise<Thread | null> => {
                 user: comment.creator.email,
                 isModerator: comment.creator.isModerator
 
-            })) : []
+            })) : [],
+            tags: data.tags.map(tag => ({
+                ...tag,
+                tagType: tag.tagType 
+            }))
         };
 
-        console.log(`Fetched ${thread.comments.length} comments for thread ID ${id}.`);
-    
         return thread;
     } catch (error) {
         toast.error('Failed to fetch thread: ' + (error as Error).message);
@@ -97,7 +100,11 @@ export const createThread = async (data: Thread) => {
             comments: [],
             isQnA: data.isQnA || false,
             isAnswered: data.isAnswered || false,
-            isLocked: data.isLocked || false
+            isLocked: data.isLocked || false,
+            tags: data.tags.map(tag => ({
+                ...tag,
+                tagType: tag.tagType
+            })) || []
         };
 
         await addDoc(collection(db, 'threads'), newThread);

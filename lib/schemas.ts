@@ -11,4 +11,21 @@ export const ThreadSchema = z.object({
         message: 'Thread category is required.',
     }),
     isQnA: z.boolean().optional(),
+    tags: z.array(z.object({
+        threadTagId: z.string(),
+        tagType: z.enum([
+            "WEB DEVELOPMENT",
+            "MOBILE DEVELOPMENT",
+            "DATA SCIENCE",
+            "MACHINE LEARNING",
+            "DEVOPS",
+            "UI/UX DESIGN",
+            "CYBERSECURITY",
+            "CLOUD COMPUTING",
+            "GAME DEVELOPMENT",
+            "DATABASES"
+        ])
+    })).nonempty({
+        message: 'At least one tag is required.',
+    }),
 });
