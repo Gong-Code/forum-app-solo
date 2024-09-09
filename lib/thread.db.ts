@@ -1,48 +1,48 @@
 import { Thread, ThreadCategory, Comment } from '@/app/types/thread';
 import { db } from '@/firebase.config';
-import { setDoc, doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
+import { setDoc, doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc, CollectionReference, DocumentData, getDocFromServer, getDocsFromServer, query, where } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { Timestamp } from 'firebase/firestore'; 
 import { getUserById } from './user.db';
-
-type UserProps = {
-    isModerator: boolean;
-}
+import { User } from '@/app/types/user';
 
 export const getAllThreads = async (): Promise<Thread[]> => {
     try {
         const threadsCollection = collection(db, 'threads');
-        const threadsSnapshot = await getDocs(threadsCollection);
-        const threads: Thread[] = await Promise.all(threadsSnapshot.docs.map(async doc => {
-            const data = doc.data() as Thread;
-            const thread: Thread = {
-                ...data,
-                id: doc.id,
-                creationDate: Timestamp.fromDate(data.creationDate.toDate()),
-                comments: []
-            };
+        const threadsSnapshot = await getDocsFromServer(threadsCollection); 
+        const threads: Thread[] = await Promise.all(
+            threadsSnapshot.docs.map(async (doc) => {
+                const data = doc.data() as Thread;
+                const thread: Thread = {
+                    ...data,
+                    id: doc.id,
+                    creationDate: Timestamp.fromDate(data.creationDate.toDate()),
+                    comments: [],
+                };
 
-            const commentsCollection = collection(db, 'threads', doc.id, 'comments');
-            const commentsSnapshot = await getDocs(commentsCollection);
-            if (!commentsSnapshot.empty) {
-                thread.comments = commentsSnapshot.docs.map(commentDoc => {
-                    const commentData = commentDoc.data() as Comment;
-                    return {
-                        ...commentData,
-                        creationDate: Timestamp.fromDate(commentData.creationDate.toDate()),
-                        user: commentData.creator.email
-                    };
-                });
-            }
+                const commentsCollection = collection(db, 'threads', doc.id, 'comments');
+                const commentsSnapshot = await getDocsFromServer(commentsCollection); 
+                if (!commentsSnapshot.empty) {
+                    thread.comments = commentsSnapshot.docs.map((commentDoc) => {
+                        const commentData = commentDoc.data() as Comment;
+                        return {
+                            ...commentData,
+                            creationDate: Timestamp.fromDate(commentData.creationDate.toDate()),
+                            user: commentData.creator.email,
+                        };
+                    });
+                }
 
-            return thread;
-        }));
+                return thread;
+            })
+        );
         return threads;
     } catch (error) {
         toast.error('Failed to fetch threads: ' + (error as Error).message);
         return [];
     }
 };
+
 
 export const getThreadById = async (id: string): Promise<Thread | null> => {
     try {
@@ -108,23 +108,6 @@ export const createThread = async (data: Thread) => {
     }
 };
 
-export const updateThread = async (threadId: string, fieldsToUpdate: Partial<Thread>): Promise<void> => {
-    try {
-        const threadDocRef = doc(db, 'threads', threadId);
-        const threadDoc = await getDoc(threadDocRef);
-
-        if (!threadDoc.exists()) {
-            throw new Error('Thread not found');
-        }
-
-        await updateDoc(threadDocRef, fieldsToUpdate);
-        toast.success('Thread updated successfully!');
-    } catch (error) {
-        toast.error('Failed to update thread: ' + (error as Error).message);
-        console.error('Error updating thread:', error);
-    }
-};
-
 export const lockThread = async (threadId: string, isLocked: boolean): Promise<void> => {
     try {
         const threadDocRef = doc(db, 'threads', threadId);
@@ -186,7 +169,7 @@ export const addCommentToThread = async (threadId: string, comment: Comment): Pr
     }
 };
 
-export const editThread = async (threadId: string, user: UserProps, updatedData: Partial<Thread>): Promise<Thread | null> => {
+export const editThread = async (threadId: string, user: User, updatedData: Partial<Thread>): Promise<Thread | null> => {
     try {
         const threadDocRef = doc(db, 'threads', threadId);
         const threadDoc = await getDoc(threadDocRef);
@@ -198,13 +181,11 @@ export const editThread = async (threadId: string, user: UserProps, updatedData:
 
         const threadData = threadDoc.data() as Thread;
 
-        // Check if the user is the creator or a moderator
         if (threadData.creator.id !== user.id && !user.isModerator) {
             toast.error('You do not have permission to edit this thread.');
             throw new Error('You do not have permission to edit this thread.');
         }
 
-        // Update the thread with the provided data
         await updateDoc(threadDocRef, updatedData);
         toast.success('Thread updated successfully!');
         return { ...threadData, ...updatedData };
@@ -214,7 +195,7 @@ export const editThread = async (threadId: string, user: UserProps, updatedData:
     }
 };
 
-export const deleteThreadByModerator = async (threadId: string, user: UserProps): Promise<Thread | null> => {
+export const deleteThreadByModerator = async (threadId: string, user: User): Promise<Thread | null> => {
     if (!user.isModerator) {
         toast.error('You do not have permission to delete this thread.');
         throw new Error('You do not have permission to delete this thread.');

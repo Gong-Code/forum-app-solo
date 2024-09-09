@@ -47,8 +47,10 @@ const ThreadDetailsPage = () => {
         const fetchThread = async () => {
             if (id) {
                 try {
-                    const fetchedThread = await getThreadById(id);
+                    console.log('Fetching thread with ID:', id);
+                    const fetchedThread = await getThreadById(id.toString() || '');
                     if (fetchedThread) {
+                        console.log('Fetched thread:', fetchedThread);
                         setThread(fetchedThread);
                         setComments(fetchedThread.comments);
                         setThreadCreatorId(fetchedThread.creator);
@@ -71,12 +73,12 @@ const ThreadDetailsPage = () => {
         };
 
         fetchThread();
-    }, [id, router]);
+    }, [id, router, setComments, setAnswered, setAnsweredCommentId]);
 
     const handleEditClick = async () => {
         try {
-            const fetchedThread = await getThreadById(thread.id);
-            if (fetchedThread && (fetchedThread.creator.id === currentUser.id || currentUser.isModerator)) {
+            const fetchedThread = await getThreadById(thread?.id ?? '');
+            if (fetchedThread && (currentUser && fetchedThread.creator.id === currentUser.id || currentUser?.isModerator)) {
                 router.push(`/threads/${fetchedThread.category}/edit/${fetchedThread.id}`);
             } else {
                 toast.error('You do not have permission to edit this thread.');
@@ -90,7 +92,7 @@ const ThreadDetailsPage = () => {
     const handleToggleLock = async () => {
         if (!thread) return;
 
-        if (thread.creator.id !== currentUser.id && !currentUser.isModerator) {
+        if (currentUser && thread.creator.id !== currentUser.id && !currentUser.isModerator) {
             toast.error('You do not have permission to lock/unlock this thread.');
             return;
         }

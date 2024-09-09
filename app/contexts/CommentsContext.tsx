@@ -2,10 +2,11 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Comment, Thread } from '@/app/types/thread';
-import { getThreadById, updateThread } from '@/lib/thread.db';
+import { editThread, getThreadById, } from '@/lib/thread.db';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/app/providers/authProvider';
 import toast from 'react-hot-toast';
+import { User } from '../types/user';
 
 type CommentsContextType = {
     comments: Comment[];
@@ -88,7 +89,7 @@ const CommentsProvider: React.FC<{ children: React.ReactNode }> = ({
                 fieldsToUpdate.answeredCommentId = null;
             }
 
-            await updateThread(thread.id, fieldsToUpdate);
+            await editThread(thread.id, currentUser, fieldsToUpdate);
 
             setAnswered(newIsAnswered);
             setAnsweredCommentId(newIsAnswered ? commentId : null);

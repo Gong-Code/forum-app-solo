@@ -26,7 +26,7 @@ export const LatestThreads = () => {
     useEffect(() => {
         const fetchThreads = async () => {
             try {
-                const data: Thread[] = await getAllThreads();
+                const data = await getAllThreads();
                 setThreads(data);
             } catch (error) {
                 console.error('Error fetching threads:', error);
@@ -98,6 +98,7 @@ export const LatestThreads = () => {
                                         </span>
                                     </div>
                                 </TableCell>
+                                
                             </TableRow>
                         ))
                     ) : (

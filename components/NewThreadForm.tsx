@@ -26,34 +26,22 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { useRouter } from 'next/navigation';
-
-const FormSchema = z.object({
-    threadTitle: z.string().min(10, {
-        message: 'Your new thread message must be at least 10 characters.',
-    }),
-    threadBody: z.string().min(10, {
-        message: 'Your new thread message must be at least 10 characters.',
-    }),
-    threadCategory: z.string().min(1, {
-        message: 'Thread category is required.',
-    }),
-    isQnA: z.boolean().optional(),
-});
+import { ThreadSchema } from '@/lib/schemas';
 
 export const NewThreadForm = () => {
     const { user: currentUser } = useAuth();
     const router = useRouter();
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+    const form = useForm<z.infer<typeof ThreadSchema>>({
+        resolver: zodResolver(ThreadSchema),
         defaultValues: {
-            threadTitle: '',
-            threadBody: '',
+            title: '',
+            description: '',
             threadCategory: '',
             isQnA: false,
-        } as z.infer<typeof FormSchema>,
+        } as z.infer<typeof ThreadSchema>,
     });
 
-    const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const onSubmit = async (data: z.infer<typeof ThreadSchema>) => {
         if (!currentUser) {
             toast.error('You must be logged in to create a thread.');
             return;
@@ -64,9 +52,9 @@ export const NewThreadForm = () => {
                 id: '',
                 creationDate: Timestamp.fromDate(new Date()),
                 comments: [],
-                title: data.threadTitle,
+                title: data.title,
                 category: data.threadCategory as ThreadCategory,
-                description: data.threadBody,
+                description: data.description,
                 creator: {
                     id: currentUser.id,
                     email: currentUser.email,
@@ -101,7 +89,7 @@ export const NewThreadForm = () => {
                 className='mx-auto w-2/3 space-y-4 pl-12 py-12 max-w-3xl'>
                 <FormField
                     control={form.control}
-                    name='threadTitle'
+                    name='title'
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel className='text-xl'>
@@ -124,7 +112,7 @@ export const NewThreadForm = () => {
                 />
                 <FormField
                     control={form.control}
-                    name='threadBody'
+                    name='description'
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
