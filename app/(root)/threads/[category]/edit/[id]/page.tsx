@@ -67,6 +67,10 @@ const EditThread = () => {
                 return;
             }
 
+            // Map over the fetchedThread.tags array and transform each tag into a new format.
+            // The new format includes threadTagId and tagType, where tagType is asserted to be one of the specified string values.
+            // The result is cast to a specific TypeScript type: [ThreadTag, ...ThreadTag[]], ensuring the array contains at least one ThreadTag object.
+
             const mappedTags: [ThreadTag, ...ThreadTag[]] = fetchedThread.tags.map(tag => ({
                 threadTagId: tag.threadTagId,
                 tagType: tag.tagType as "WEB DEVELOPMENT" | "MOBILE DEVELOPMENT" | "DATA SCIENCE" | "MACHINE LEARNING" | "DEVOPS" | "UI/UX DESIGN" | "CYBERSECURITY" | "CLOUD COMPUTING" | "GAME DEVELOPMENT" | "DATABASES"

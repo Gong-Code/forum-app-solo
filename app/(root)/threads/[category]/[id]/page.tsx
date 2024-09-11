@@ -43,6 +43,7 @@ const ThreadDetailsPage = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
+
     useEffect(() => {
         const fetchThread = async () => {
             if (id) {

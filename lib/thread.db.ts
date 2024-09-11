@@ -1,4 +1,4 @@
-import { Thread, ThreadCategory, Comment } from '@/app/types/thread';
+import { Thread, Comment } from '@/app/types/thread';
 import { db } from '@/firebase.config';
 import { setDoc, doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc, CollectionReference, DocumentData, getDocFromServer, getDocsFromServer, query, where } from 'firebase/firestore';
 import toast from 'react-hot-toast';
@@ -43,7 +43,6 @@ export const getAllThreads = async (): Promise<Thread[]> => {
         return [];
     }
 };
-
 
 export const getThreadById = async (id: string): Promise<Thread | null> => {
     try {

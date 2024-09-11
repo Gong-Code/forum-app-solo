@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import bcrypt from 'bcryptjs';
 import { User } from '@/app/types/user';
 
+
+
 export const getAllUsers = async (): Promise<User[]> => {
     try {
         const userRef = collection(db, 'users');
